@@ -449,7 +449,11 @@ class CodeSearchGenerator(SkyRLGymGenerator):
                         else:
                             mask.append(1)
                     
-                    found_role_switch = True if token_id == end_token_id else False
+                    # mark role switch is <|im_start|> is found
+                    if token_id == start_token_id:
+                        found_role_switch = True
+                    else:
+                        found_role_switch = False
 
                 # mask zero out everything beyond max_response_len
                 # Don't truncate the response, just mask out the loss

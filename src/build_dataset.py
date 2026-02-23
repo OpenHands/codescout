@@ -52,6 +52,7 @@ def main():
 
     output_path = os.path.join(output_dir, "validation.parquet")
     validation_dataset.to_parquet(output_path)
+    print(len(train_dataset), len(validation_dataset))
 
 
 if __name__ == "__main__":
