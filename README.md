@@ -71,7 +71,7 @@ We open-source all our models, datasets and trajectories in this [Hugging Face c
 #### Installing Dependencies:
 
 Training CodeScout models requires access to GPUs. We use 8xH100 GPUs for all our RL runs.
-> **IMPORTANT NOTE**: You must ensure that the uv venv is not saved in the repository root since our training backend (SkyRL) uses Ray which copies all the files in this repository to a  during RL.
+> **IMPORTANT NOTE**: You must ensure that the uv venv is not saved in the repository root since our training backend (SkyRL) uses Ray which copies all the files in this repository to a Ray cluster during RL.
 
 ```bash
 export VIRTUAL_ENV=<location where uv virtual environment must be installed>
