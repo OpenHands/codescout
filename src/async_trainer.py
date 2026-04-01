@@ -95,7 +95,6 @@ class CustomFullyAsyncRayPPOTrainer(FullyAsyncRayPPOTrainer):
 
             # Check staleness violation.
             if cur_staleness > self.max_staleness_steps:
-                # TODO(Charlie): should we drop, drop and resample, or just log?
                 logger.warning(
                     "Staleness control violated despite using AsyncStalenessManager: "
                     f"cur_staleness={cur_staleness}, max_staleness_steps={self.max_staleness_steps}.\n"

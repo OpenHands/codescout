@@ -291,7 +291,6 @@ class CodeSearchGenerator(SkyRLGymGenerator):
         trajectory_id: TrajectoryID,
         batch_metadata: BatchMetadata,
     ) -> Tuple[List[int], float, str, List[int], List[int], Optional[List[int]], Optional[Dict[str, Any]]]:
-        # NOTE (sumanthrh): Input `prompt` is not used here because mini-swe-agent uses a similar entry from the `instance` obj
         instance = env_extras
         error = None
         try:
@@ -308,7 +307,6 @@ class CodeSearchGenerator(SkyRLGymGenerator):
             )
         except Exception as e:
             logger.error(f"Critical Error in conversation: {str(e)}", exc_info=True)
-            # TODO properly handle this
             error = str(e) + "\n" + traceback.format_exc()
             messages = []
             final_message = ""

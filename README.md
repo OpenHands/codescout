@@ -1,14 +1,5 @@
 <h1 align="center"> CodeScout: An Effective Recipe for Reinforcement Learning of Code Search Agents</h1>
 
-<p align="center">
-	<a href="https://arxiv.org/abs/2603.17829">
-		<img src="https://img.shields.io/badge/arXiv-2603.17829-b31b1b.svg" alt="arXiv" />
-	</a>
-	<a href="https://huggingface.co/collections/OpenHands/codescout">
-		<img src="https://img.shields.io/badge/🤗%20Models%20%26%20Data-CodeScout%20Collection-yellow" alt="Hugging Face Collection" />
-	</a>
-</p>
-
 
 This repository contains the source code for the paper **CodeScout: An Effective Recipe for Reinforcement Learning of Code Search Agents**
 
@@ -33,19 +24,6 @@ Given a GitHub issue and a pre-PR repository, CodeScout navigates the repository
 We train 1.7B, 4B, and 14B models using RL wherein our reward function is the sum of file-level, module-level, and function-level F1 scores. 
 
 ![CodeScout system diagram](./docs/recipe.png)
-
----
-
-## 🤗 Models & Datasets
-
-We open-source all our models, datasets and trajectories in this [Hugging Face collection](https://huggingface.co/collections/OpenHands/codescout)
-- Models: [CodeScout-14B](https://huggingface.co/OpenHands/CodeScout-14B), [CodeScout-4B](https://huggingface.co/OpenHands/CodeScout-4B), [CodeScout-1.7B](https://huggingface.co/OpenHands/CodeScout-1.7B), [CodeScout-1.7B-RFT](https://huggingface.co/OpenHands/CodeScout-1.7B-RFT)
-- Training datasets (re-purposed for code localization): [SWE-Smith](https://huggingface.co/datasets/OpenHands/SWE-smith-py-code-search), [SWE-Gym](https://huggingface.co/datasets/OpenHands/SWE-Gym-code-search), [SWE-rebench](https://huggingface.co/datasets/OpenHands/SWE-rebench-code-search).
-- Evaluation benchmarks (re-purposed for code search): [SWE-Bench Verified](https://huggingface.co/datasets/OpenHands/SWE-bench_Verified-locagent), [SWE-Bench Pro](https://huggingface.co/datasets/OpenHands/SWE-bench_Pro-locagent), [SWE-Bench Lite](https://huggingface.co/datasets/OpenHands/SWE-bench_Lite-locagent)
-- Rollouts:
-  - [Training Rollouts logged during RL for CodeScout-14B and CodeScout-4B](https://huggingface.co/datasets/OpenHands/CodeScout_Training_Rollouts)
-  - [Evaluation Trajectories for all our experiments on 12 models using 3 benchmarks](https://huggingface.co/datasets/OpenHands/CodeScout_Eval_Rollouts) 
----
 
 ## 🚀 Quick Start
 
@@ -88,26 +66,6 @@ bash scripts/run_async_training_4b.sh -m Qwen/Qwen3-4B-Instruct-2507 -n 8 -b 8 -
 
 ```
 
-Refer to [this README](./README_Training.md) for detailed instructions on reproducing our RL runs.
-
-
 ### 📊 Evaluation Setup
 
-All our evaluation experiments have been performed using this [fork](https://github.com/adityasoni9998/benchmarks/tree/agentic_code_search) of the [OpenHands benchmarks repository](https://github.com/OpenHands/benchmarks). The repository has detailed instructions on reproducing our evaluation results.
-
----
-
-## 📚 Citation
-
-```bibtex
-@misc{sutawika2026codescouteffectiverecipereinforcement,
-	title={CodeScout: An Effective Recipe for Reinforcement Learning of Code Search Agents}, 
-	author={Lintang Sutawika and Aditya Bharat Soni and Bharath Sriraam R R and Apurva Gandhi and Taha Yassine and Sanidhya Vijayvargiya and Yuchen Li and Xuhui Zhou and Yilin Zhang and Leander Melroy Maben and Graham Neubig},
-	year={2026},
-	eprint={2603.17829},
-	archivePrefix={arXiv},
-	primaryClass={cs.SE},
-	url={https://arxiv.org/abs/2603.17829}, 
-}
-```
-
+We will release the code for evaluation soon.

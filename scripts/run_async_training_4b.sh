@@ -1,14 +1,3 @@
-#!/bin/bash
-
-
-# export REWARD=file_loc
-# sbatch scripts/run_async_training.sh \
-#   -m Qwen/Qwen3-8B -n 8 -b 1 -i 4 -t 4 \
-#   -d data/swe_gym \
-#   -s /project/flame/lsutawik/cso/ckpts/qwen3-8b-8x8-${REWARD}/ \
-#   -o "+generator.reward=configs/rewards/${REWARD}.yaml"
-
-# . .env
 
 while getopts ":m:n:d:s:l:o:i:t:b:c:r:w:" opt; do
   case ${opt} in
