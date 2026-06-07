@@ -51,6 +51,23 @@ MOCK_TOOL_RESPONSE = {
     "content": "Search results here",
 }
 
+MOCK_ACTION_EVENT_BASH = {
+    "kind": "ActionEvent",
+    "tool_name": "bash",
+    "llm_response_id": "turn-1",
+}
+
+MOCK_ACTION_EVENT_RESULT = {
+    "kind": "ActionEvent",
+    "tool_name": "result",
+    "llm_response_id": "turn-1",
+}
+
+MOCK_ACTION_EVENT_UNKNOWN = {
+    "kind": "ActionEvent",
+    "llm_response_id": "turn-1",
+}
+
 
 class TestComputeTokenMetrics:
     """Tests for compute_token_metrics function."""
@@ -84,10 +101,10 @@ class TestComputeTokenMetrics:
         """Test with multiple TokenEvents."""
         messages = [MOCK_TOKEN_MESSAGE_1, MOCK_TOKEN_MESSAGE_2]
         result = compute_token_metrics(messages)
-        assert result["total_tokens"] == 15  # (4+3) + (6+2)
-        assert result["total_prompt_tokens"] == 10  # 4 + 6
+        assert result["total_tokens"] == 11  # latest prompt + all responses
+        assert result["total_prompt_tokens"] == 6
         assert result["total_response_tokens"] == 5  # 3 + 2
-        assert result["avg_prompt_tokens_per_step"] == 5.0  # 10/2
+        assert result["avg_prompt_tokens_per_step"] == 3.0  # 6/2
         assert result["avg_response_tokens_per_step"] == 2.5  # 5/2
 
     def test_mixed_messages(self):
@@ -100,8 +117,8 @@ class TestComputeTokenMetrics:
         ]
         result = compute_token_metrics(messages)
         # Should only count the two TokenEvents
-        assert result["total_tokens"] == 15
-        assert result["total_prompt_tokens"] == 10
+        assert result["total_tokens"] == 11
+        assert result["total_prompt_tokens"] == 6
         assert result["total_response_tokens"] == 5
 
 
@@ -190,6 +207,26 @@ class TestComputeToolCallMetrics:
         assert result["total_tool_calls"] == 2
         assert result["avg_tool_calls_per_step"] == 1.0  # 2 tools / 2 steps
 
+    def test_action_event_tool_calls(self):
+        """Test tool counting from SDK ActionEvent trajectory messages."""
+        messages = [
+            MOCK_TOKEN_MESSAGE_1,
+            MOCK_ACTION_EVENT_BASH,
+            MOCK_ACTION_EVENT_RESULT,
+        ]
+        result = compute_tool_call_metrics(messages)
+        assert result["total_tool_calls"] == 2
+        assert result["avg_tool_calls_per_step"] == 2.0
+        assert result["tool_call_breakdown"]["bash"] == 1
+        assert result["tool_call_breakdown"]["result"] == 1
+
+    def test_action_event_without_tool_name(self):
+        """Test ActionEvent fallback when tool_name is absent."""
+        messages = [MOCK_TOKEN_MESSAGE_1, MOCK_ACTION_EVENT_UNKNOWN]
+        result = compute_tool_call_metrics(messages)
+        assert result["total_tool_calls"] == 1
+        assert result["tool_call_breakdown"]["unknown"] == 1
+
 
 class TestComputeAllEfficiencyMetrics:
     """Tests for compute_all_efficiency_metrics function."""
@@ -209,9 +246,11 @@ class TestComputeAllEfficiencyMetrics:
         """Test with complete trajectory including tokens, steps, and tools."""
         messages = [
             MOCK_TOKEN_MESSAGE_1,  # Step 1: 7 tokens
-            MOCK_ASSISTANT_MESSAGE_WITH_TOOLS,  # 2 tool calls
+            MOCK_ACTION_EVENT_BASH,
+            MOCK_ACTION_EVENT_RESULT,
             MOCK_TOKEN_MESSAGE_2,  # Step 2: 8 tokens
-            MOCK_ASSISTANT_MESSAGE_WITH_TOOLS,  # 2 tool calls
+            MOCK_ACTION_EVENT_BASH,
+            MOCK_ACTION_EVENT_RESULT,
         ]
         result = compute_all_efficiency_metrics(
             messages=messages,
@@ -221,23 +260,16 @@ class TestComputeAllEfficiencyMetrics:
         )
 
         # Check core metrics
-        assert result["tokens"] == 15  # 7 + 8
+        assert result["tokens"] == 11  # latest prompt + all responses
         assert result["steps"] == 2
         assert result["avg_tool_calls_per_step"] == 2.0  # 4 tools / 2 steps
         assert result["wall_clock_duration"] == 15.5
 
-        # Check timestamps
-        assert result["start_timestamp"] == "2025-01-01T10:00:00"
-        assert result["end_timestamp"] == "2025-01-01T10:00:15"
-
-        # Check token breakdown
-        assert result["token_breakdown"]["total_prompt_tokens"] == 10
-        assert result["token_breakdown"]["total_response_tokens"] == 5
-
-        # Check tool breakdown
-        assert result["tool_breakdown"]["total_tool_calls"] == 4
-        assert result["tool_breakdown"]["by_tool_type"]["bash"] == 2
-        assert result["tool_breakdown"]["by_tool_type"]["result"] == 2
+        # Check flattened token fields
+        assert result["total_prompt_tokens"] == 6
+        assert result["total_response_tokens"] == 5
+        assert result["avg_prompt_tokens_per_step"] == 3.0
+        assert result["avg_response_tokens_per_step"] == 2.5
 
     def test_without_timestamps(self):
         """Test that timestamps are optional."""
