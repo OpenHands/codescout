@@ -22,7 +22,7 @@ def patched_concatenate_generator_outputs(generator_outputs: List[GeneratorOutpu
     """
     Concatenate the generator outputs of multiple batches.
 
-    We only aggregate rollout metrics the can deduced by responses and rewards, but not
+    We only aggregate rollout metrics that can be deduced by responses and rewards, but not
     those that use `env_metrics` or `env_classes`.
     """
     assert len(generator_outputs) > 0
