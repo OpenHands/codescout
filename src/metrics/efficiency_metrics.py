@@ -12,11 +12,14 @@ def compute_token_metrics(messages: List[Dict[str, Any]]) -> Dict[str, float]:
 
     Returns:
         Dictionary with keys:
-        - total_tokens: Total tokens (prompt + response)
-        - total_prompt_tokens: Total prompt tokens
+        - total_tokens: Total tokens (latest prompt + all responses)
+        - total_prompt_tokens: Prompt tokens from the latest TokenEvent
         - total_response_tokens: Total response/completion tokens
         - avg_prompt_tokens_per_step: Average prompt tokens per TokenEvent
         - avg_response_tokens_per_step: Average response tokens per TokenEvent
+
+        TokenEvent prompt_token_ids are cumulative across turns, so summing every
+        prompt would double count earlier trajectory context.
     """
     token_messages = [msg for msg in messages if msg.get("kind") == "TokenEvent"]
 
@@ -77,7 +80,7 @@ def compute_tool_call_metrics(messages: List[Dict[str, Any]]) -> Dict[str, Any]:
         - avg_tool_calls_per_step: Average tool calls per step
         - tool_call_breakdown: Dict mapping tool names to counts
     """
-    # Find all assistant messages with tool calls
+    # Count SDK ActionEvents and OpenAI-style assistant tool calls.
     tool_call_count = 0
     tool_breakdown = {}
     if not messages:
@@ -88,6 +91,12 @@ def compute_tool_call_metrics(messages: List[Dict[str, Any]]) -> Dict[str, Any]:
         }
 
     for msg in messages:
+        if msg.get("kind") == "ActionEvent":
+            tool_name = msg.get("tool_name") or "unknown"
+            tool_call_count += 1
+            tool_breakdown[tool_name] = tool_breakdown.get(tool_name, 0) + 1
+            continue
+
         # Assistant messages contain tool_calls field
         if msg.get("role") == "assistant" and "tool_calls" in msg:
             tool_calls = msg.get("tool_calls", [])
